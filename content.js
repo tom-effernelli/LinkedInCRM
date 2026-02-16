@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_KEY_PREFIX = "linkedin_notes_";
+  let lastProfileId = null;
 
   /**
    * Extrait l'ID unique du profil depuis l'URL (ex: /in/john-doe-123/ -> john-doe-123)
@@ -10,6 +11,14 @@
     const path = window.location.pathname;
     const match = path.match(/\/in\/([^/]+)/);
     return match ? match[1].toLowerCase() : null;
+  }
+
+  /**
+   * Supprime la card du DOM (pour navigation SPA).
+   */
+  function removeCard() {
+    const card = document.getElementById("linkedin-notes-extension-card");
+    if (card) card.remove();
   }
 
   function getStorageKey() {
@@ -38,9 +47,11 @@
     const key = getStorageKey();
     if (!key) return null;
 
+    const profileId = getProfileId();
     const card = document.createElement("div");
     card.id = "linkedin-notes-extension-card";
     card.className = "linkedin-notes-card";
+    card.dataset.profileId = profileId;
     card.innerHTML = `
       <div class="linkedin-notes-header">
         <span class="linkedin-notes-title">Mes notes (privées)</span>
@@ -96,20 +107,33 @@
   }
 
   /**
-   * Insère la card juste après l'élément .pv-top-card (ou équivalent)
+   * Retourne le conteneur "Top Card" LinkedIn (priorité au sélecteur le plus fiable).
    */
-  function injectCard() {
-    if (document.getElementById("linkedin-notes-extension-card")) return;
-
-    const key = getStorageKey();
-    if (!key) return;
-
-    const container =
+  function getTopCardContainer() {
+    return (
       document.querySelector(".pv-top-card") ||
       document.querySelector("[data-top-card]") ||
       document.querySelector(".scaffold-layout__main aside") ||
-      document.querySelector(".pv-profile-section");
+      document.querySelector(".pv-profile-section")
+    );
+  }
 
+  /**
+   * Insère la card juste après l'élément .pv-top-card (ou équivalent).
+   * Si une card existe déjà pour un autre profil, elle est supprimée et remplacée.
+   */
+  function injectCard() {
+    const currentProfileId = getProfileId();
+    const key = getStorageKey();
+    if (!key) return;
+
+    const existingCard = document.getElementById("linkedin-notes-extension-card");
+    if (existingCard) {
+      if (existingCard.dataset.profileId === currentProfileId) return;
+      existingCard.remove();
+    }
+
+    const container = getTopCardContainer();
     if (!container) return;
 
     const result = createNotesCard();
@@ -119,29 +143,34 @@
     if (parent) {
       parent.insertBefore(result.card, container.nextSibling);
     }
+    lastProfileId = currentProfileId;
   }
 
   /**
-   * Attend que la cible soit présente dans le DOM (MutationObserver + délai de secours)
+   * Attend que la Top Card soit présente (MutationObserver ciblé + délai de secours).
+   * Marge de sécurité (debounce) pour éviter double injection en transitions rapides.
    */
+  let injectDebounceTimer = null;
+  const INJECT_DEBOUNCE_MS = 300;
+
   function waitAndInject() {
     function tryInject() {
-      const container =
-        document.querySelector(".pv-top-card") ||
-        document.querySelector("[data-top-card]") ||
-        document.querySelector(".scaffold-layout__main aside") ||
-        document.querySelector(".pv-profile-section");
-      if (container) {
-        injectCard();
-        return true;
-      }
-      return false;
+      const container = getTopCardContainer();
+      if (!container) return false;
+      injectCard();
+      return true;
     }
 
     if (tryInject()) return;
 
     const observer = new MutationObserver(() => {
-      if (tryInject()) observer.disconnect();
+      const container = getTopCardContainer();
+      if (!container) return;
+      if (injectDebounceTimer) clearTimeout(injectDebounceTimer);
+      injectDebounceTimer = setTimeout(() => {
+        injectDebounceTimer = null;
+        if (tryInject()) observer.disconnect();
+      }, INJECT_DEBOUNCE_MS);
     });
 
     observer.observe(document.body, {
@@ -151,13 +180,34 @@
 
     setTimeout(() => {
       observer.disconnect();
+      if (injectDebounceTimer) clearTimeout(injectDebounceTimer);
+      injectDebounceTimer = null;
       tryInject();
     }, 5000);
   }
 
+  /**
+   * Vérifie si l'URL a changé (navigation SPA) et réagit au changement de profil.
+   */
+  function checkUrlChange() {
+    const currentId = getProfileId();
+    if (currentId === null) return;
+    if (lastProfileId !== null && lastProfileId !== currentId) {
+      removeCard();
+      lastProfileId = currentId;
+      waitAndInject();
+    }
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", waitAndInject);
+    document.addEventListener("DOMContentLoaded", () => {
+      waitAndInject();
+      window.addEventListener("popstate", checkUrlChange);
+      setInterval(checkUrlChange, 800);
+    });
   } else {
     waitAndInject();
+    window.addEventListener("popstate", checkUrlChange);
+    setInterval(checkUrlChange, 800);
   }
 })();
