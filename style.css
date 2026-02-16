@@ -11,67 +11,79 @@
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-  margin-top: 16px;
-  margin-bottom: 16px;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 4px 4px rgba(0,0,0,0.04);
+  
+  margin-top: 12px; 
+  margin-bottom: 12px;
+  
   overflow: hidden;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, sans-serif;
+  
+  position: relative;
+  z-index: 0;
+  clear: both;
 }
 
 .linkedin-notes-header {
   padding: 12px 16px;
   border-bottom: 1px solid #e0e0e0;
+  background-color: #f9fafb;
 }
 
 .linkedin-notes-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.9);
-  letter-spacing: 0.02em;
 }
 
 .linkedin-notes-textarea {
   display: block;
   width: 100%;
-  min-height: 80px;
+  min-height: 100px;
   margin: 0;
   padding: 12px 16px;
   border: none;
   border-bottom: 1px solid #e0e0e0;
   border-radius: 0;
   font-size: 14px;
-  line-height: 1.4;
+  line-height: 1.5;
   color: rgba(0, 0, 0, 0.9);
   resize: vertical;
   box-sizing: border-box;
   font-family: inherit;
+  background-color: transparent;
 }
 
 .linkedin-notes-textarea::placeholder {
-  color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.5);
 }
 
 .linkedin-notes-textarea:focus {
   outline: none;
+  background-color: #f3f6f8;
   border-bottom-color: #0a66c2;
 }
 
 .linkedin-notes-actions {
   display: flex;
+  justify-content: flex-end;
   gap: 8px;
-  padding: 12px 16px;
-  flex-wrap: wrap;
+  padding: 8px 16px;
+  background-color: #fff;
 }
 
 .linkedin-notes-btn {
-  padding: 8px 16px;
+  padding: 6px 16px;
   border-radius: 24px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  border: none;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  border: 1px solid transparent;
+  transition: all 0.2s;
   font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .linkedin-notes-btn-save {
@@ -85,21 +97,17 @@
 
 .linkedin-notes-btn-save.linkedin-notes-saved {
   background-color: #057642;
-  color: #ffffff;
-}
-
-.linkedin-notes-btn-save.linkedin-notes-saved:hover {
-  background-color: #004d2a;
+  border-color: #057642;
 }
 
 .linkedin-notes-btn-clear {
   background-color: transparent;
   color: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
 }
 
 .linkedin-notes-btn-clear:hover {
-  background-color: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.45);
+  background-color: rgba(0, 0, 0, 0.04);
   color: rgba(0, 0, 0, 0.75);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.6);
 }
