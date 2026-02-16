@@ -1,0 +1,105 @@
+/* LinkedIn Profile Notes - Style Card LinkedIn */
+
+#linkedin-notes-extension-card,
+.linkedin-notes-card {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.linkedin-notes-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  margin-top: 16px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, sans-serif;
+}
+
+.linkedin-notes-header {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.linkedin-notes-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.02em;
+}
+
+.linkedin-notes-textarea {
+  display: block;
+  width: 100%;
+  min-height: 80px;
+  margin: 0;
+  padding: 12px 16px;
+  border: none;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.9);
+  resize: vertical;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.linkedin-notes-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.linkedin-notes-textarea:focus {
+  outline: none;
+  border-bottom-color: #0a66c2;
+}
+
+.linkedin-notes-actions {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+}
+
+.linkedin-notes-btn {
+  padding: 8px 16px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  font-family: inherit;
+}
+
+.linkedin-notes-btn-save {
+  background-color: #0a66c2;
+  color: #ffffff;
+}
+
+.linkedin-notes-btn-save:hover {
+  background-color: #004182;
+}
+
+.linkedin-notes-btn-save.linkedin-notes-saved {
+  background-color: #057642;
+  color: #ffffff;
+}
+
+.linkedin-notes-btn-save.linkedin-notes-saved:hover {
+  background-color: #004d2a;
+}
+
+.linkedin-notes-btn-clear {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.linkedin-notes-btn-clear:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.45);
+  color: rgba(0, 0, 0, 0.75);
+}
