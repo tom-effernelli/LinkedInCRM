@@ -8,9 +8,13 @@
    * Extrait l'ID unique du profil depuis l'URL (ex: /in/john-doe-123/ -> john-doe-123)
    */
   function getProfileId() {
-    const path = window.location.pathname;
-    const match = path.match(/\/in\/([^/]+)/);
-    return match ? match[1].toLowerCase() : null;
+    const id = window.location.pathname
+      .split("/in/")[1]
+      ?.split("/")[0]
+      ?.split("?")[0]
+      ?.split("#")[0];
+    if (!id || id.trim() === "") return null;
+    return id.trim().toLowerCase();
   }
 
   /**
