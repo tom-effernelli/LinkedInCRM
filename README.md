@@ -26,5 +26,5 @@ Refer to [this page](https://extensionworkshop.com/documentation/publish/submitt
 
 ## License
 
-Released under the **GNU GPLv3** license (see `LICENSE`).
+Released under the **CC BY-NC** license (see `LICENSE`).
 
