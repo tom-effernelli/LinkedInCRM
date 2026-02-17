@@ -1,39 +1,30 @@
 # LinkedIn Profile Notes
 
-Extension navigateur (Manifest V3) qui ajoute un bloc **“Private notes”** sur les pages de profil LinkedIn et synchronise les notes via le stockage du navigateur.
+Browser extension (Manifest V3) that adds a **“Private notes”** box on LinkedIn profile pages and syncs notes via the browser storage.
 
-## Fonctionnalités
+## Features
 
-- Ajout d’une carte “Private notes” sur les profils (`/in/...`)
-- Sauvegarde et synchronisation des notes via `storage.sync`
-- Boutons **Save** / **Clear**
+- Adds a “Private notes” card on profiles (`/in/...`)
+- Saves and syncs notes using `storage.sync`
+- **Save** / **Clear** buttons
 
-## Installation (mode développeur)
-
-### Chromium (Chrome, Edge, Brave…)
-
-1. Ouvrir `chrome://extensions`
-2. Activer **Mode développeur**
-3. **Charger l’extension non empaquetée**
-4. Sélectionner le dossier `LinkedInCRM/`
+## Installation
 
 ### Firefox
 
-1. Ouvrir `about:debugging#/runtime/this-firefox`
-2. **Charger un module temporaire**
-3. Sélectionner `LinkedInCRM/manifest.json`
+Refer to [this page](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/#self-distribution) to install a Firefox extension.
 
 ## Permissions
 
-- `storage` : enregistrer/synchroniser les notes
-- `*://*.linkedin.com/*` : injecter l’UI sur les pages LinkedIn
+- `storage`: store/sync notes
+- `*://*.linkedin.com/*`: inject the UI on LinkedIn pages
 
-## Développement
+## Development
 
-- Code principal : `LinkedInCRM/content.js`
-- Manifest : `LinkedInCRM/manifest.json`
+- Main script: `LinkedInCRM/content.js`
+- Manifest: `LinkedInCRM/manifest.json`
 
-## Licence
+## License
 
-Distribué sous licence **GNU GPLv3** (voir le fichier `LICENSE`).
+Released under the **GNU GPLv3** license (see `LICENSE`).
 
