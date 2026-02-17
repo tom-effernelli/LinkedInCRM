@@ -1,4 +1,4 @@
-# LinkedIn Profile Notes
+# LinkedIn CRM
 
 Browser extension (Manifest V3) that adds a **“Private notes”** box on LinkedIn profile pages and syncs notes via the browser storage.
 
