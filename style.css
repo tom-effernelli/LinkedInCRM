@@ -147,3 +147,10 @@
 .hidden {
   display: none !important;
 }
+
+/* --- AJOUT : Style du placeholder dans la DIV --- */
+.linkedin-notes-placeholder {
+  color: rgba(0, 0, 0, 0.5); /* Gris comme le placeholder natif */
+  pointer-events: none;       /* Le clic traverse le texte pour activer la div */
+  font-style: normal;
+}

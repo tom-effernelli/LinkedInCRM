@@ -79,13 +79,16 @@
     }
 
     function showViewMode(text) {
+      // On bascule tout de suite en mode vue (div), peu importe le contenu
+      textarea.classList.add("hidden");
+      viewDiv.classList.remove("hidden");
+
       if (!text || text.trim() === "") {
-        // Si c'est vide, on reste en mode édition pour voir le placeholder
-        showEditMode();
+        // Si c'est vide, on affiche le "faux" placeholder pour garder l'instruction
+        viewDiv.innerHTML = '<span class="linkedin-notes-placeholder">Add a note (URLs will become clickable)...</span>';
       } else {
-        textarea.classList.add("hidden");
+        // Sinon, on affiche le vrai texte transformé en liens
         viewDiv.innerHTML = linkify(text);
-        viewDiv.classList.remove("hidden");
       }
     }
 
