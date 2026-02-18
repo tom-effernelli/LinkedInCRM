@@ -127,7 +127,6 @@
     if (!card) return;
 
     targetElement.insertAdjacentElement("afterend", card);
-    console.log("LinkedIn Notes: Card injected for", currentId);
   }
 
   // --- 4. WATCH LOOP (NETTOYAGE & SURVEILLANCE) ---
@@ -137,7 +136,6 @@
     // Cas 1 : On n'est plus sur un profil principal (Flux, Page Education, etc.)
     if (!currentId) {
         if (lastProfileId !== null) {
-            console.log("LinkedIn Notes: Leaving profile main page -> Removing card.");
             removeCard();
             lastProfileId = null;
         }
@@ -146,7 +144,6 @@
 
     // Cas 2 : Changement de profil détecté
     if (lastProfileId !== currentId) {
-        console.log("LinkedIn Notes: Profile changed ->", currentId);
         lastProfileId = currentId;
         removeCard(); 
         // L'injection se fera à la ligne suivante
@@ -155,9 +152,6 @@
     // Cas 3 : On est sur un profil, on s'assure que la carte est là
     injectCard();
   }
-
-  // --- 5. INIT ---
-  console.log("LinkedIn Notes: Extension loaded (Strict Mode).");
 
   const observer = new MutationObserver(() => runLoop());
   observer.observe(document.body, { childList: true, subtree: true });
