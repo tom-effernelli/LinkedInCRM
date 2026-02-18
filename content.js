@@ -79,15 +79,13 @@
     }
 
     function showViewMode(text) {
-      // On bascule tout de suite en mode vue (div), peu importe le contenu
       textarea.classList.add("hidden");
       viewDiv.classList.remove("hidden");
 
       if (!text || text.trim() === "") {
-        // Si c'est vide, on affiche le "faux" placeholder pour garder l'instruction
-        viewDiv.innerHTML = '<span class="linkedin-notes-placeholder">Add a note (URLs will become clickable)...</span>';
+        // Injection du placeholder via un SPAN pour pouvoir le détecter plus tard
+        viewDiv.innerHTML = '<span class="linkedin-notes-placeholder">Add a note...</span>';
       } else {
-        // Sinon, on affiche le vrai texte transformé en liens
         viewDiv.innerHTML = linkify(text);
       }
     }
@@ -105,25 +103,28 @@
 
     // 1. Clic sur le texte (Lecture -> Édition)
     viewDiv.addEventListener("click", () => {
-      // On remet le texte brut dans le textarea avant d'afficher
-      textarea.value = viewDiv.innerText;
+      // CORRECTION ICI : On vérifie si c'est le placeholder ou du vrai texte
+      if (viewDiv.querySelector(".linkedin-notes-placeholder")) {
+          textarea.value = ""; // C'est le placeholder -> on vide le champ
+      } else {
+          textarea.value = viewDiv.innerText; // C'est du texte -> on le récupère
+      }
       showEditMode();
     });
 
-    // 2. Perte de Focus (Blur) -> PAS DE SAVE, JUSTE AFFICHAGE
+    // 2. Perte de Focus (Blur)
     textarea.addEventListener("blur", () => {
-       // On passe simplement en mode lecture visuelle
        showViewMode(textarea.value);
     });
 
-    // 3. Bouton Save -> LA SAUVEGARDE RÉELLE
+    // 3. Bouton Save
     saveBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       const text = textarea.value.trim();
       
       browser.storage.sync.set({ [key]: text }).then(() => {
         setSaveSuccess();
-        showViewMode(text); // On s'assure que l'affichage est à jour
+        showViewMode(text); 
       });
     });
 
@@ -135,7 +136,7 @@
           viewDiv.innerHTML = "";
           browser.storage.sync.set({ [key]: "" }).then(() => {
             setSaveSuccess();
-            showEditMode();
+            showEditMode(); // On force le mode édition vide
           });
       }
     });
