@@ -12,10 +12,13 @@
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 4px 4px rgba(0,0,0,0.04);
+  
   margin-top: 12px; 
   margin-bottom: 12px;
+  
   overflow: hidden;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, sans-serif;
+  
   position: relative;
   z-index: 0;
   clear: both;
@@ -33,7 +36,7 @@
   color: rgba(0, 0, 0, 0.9);
 }
 
-/* Styles communs pour éviter le saut visuel entre View et Edit */
+/* Styles communs (View & Edit) */
 .linkedin-notes-textarea,
 .linkedin-notes-view {
   display: block;
@@ -51,18 +54,19 @@
   background-color: transparent;
 }
 
-/* Mode Lecture spécifique */
+/* --- MODIFICATION ICI --- */
+/* Mode Lecture : On met la même bordure que le textarea (#e0e0e0) au lieu de transparent */
 .linkedin-notes-view {
   cursor: text;
   white-space: pre-wrap; 
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid #e0e0e0; /* C'est cette ligne qui fait la délimitation */
 }
 
 .linkedin-notes-view:hover {
-  background-color: #f3f6f8;
+  background-color: #f3f6f8; /* Petit effet gris au survol pour montrer que c'est cliquable */
 }
 
-/* Style des liens cliquables */
+/* Liens cliquables */
 .linkedin-notes-view a {
   color: #0a66c2;
   font-weight: 600;
@@ -73,9 +77,9 @@
   text-decoration: underline;
 }
 
-/* Mode Édition spécifique */
+/* Mode Édition */
 .linkedin-notes-textarea {
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0; /* Identique au mode vue maintenant */
   border-radius: 0;
   resize: vertical;
 }
@@ -83,7 +87,7 @@
 .linkedin-notes-textarea:focus {
   outline: none;
   background-color: #f3f6f8;
-  border-bottom-color: #0a66c2;
+  border-bottom-color: #0a66c2; /* Devient bleu quand on écrit */
 }
 
 .linkedin-notes-textarea::placeholder {

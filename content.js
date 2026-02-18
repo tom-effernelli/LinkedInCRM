@@ -6,13 +6,10 @@
 
   // --- 1. UTILITAIRES ---
   
-  // Transforme les URLs texte en liens HTML cliquables
   function linkify(text) {
     if (!text) return "";
-    // Regex pour détecter les URLs (http/https/www)
     const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     
-    // 1. On sécurise le texte (échapper le HTML pour éviter les failles XSS)
     let safeText = text
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -20,7 +17,6 @@
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 
-    // 2. On remplace les URLs par des balises <a>
     return safeText.replace(urlRegex, function(url) {
         return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
     });
@@ -54,7 +50,6 @@
     card.className = "linkedin-notes-card";
     card.dataset.profileId = getProfileId();
     
-    // Structure HTML avec DEUX zones : une pour voir (View), une pour éditer (Edit)
     card.innerHTML = `
       <div class="linkedin-notes-header">
         <span class="linkedin-notes-title">Private notes</span>
@@ -62,7 +57,7 @@
       
       <div id="linkedin-notes-view" class="linkedin-notes-view hidden"></div>
       
-      <textarea id="linkedin-notes-textarea" class="linkedin-notes-textarea" placeholder="Add a note (URLs will become clickable)..." rows="4"></textarea>
+      <textarea id="linkedin-notes-textarea" class="linkedin-notes-textarea" placeholder="Add a note..." rows="4"></textarea>
       
       <div class="linkedin-notes-actions">
         <button type="button" id="linkedin-notes-clear" class="linkedin-notes-btn linkedin-notes-btn-clear">Clear</button>
@@ -75,7 +70,7 @@
     const saveBtn = card.querySelector("#linkedin-notes-save");
     const clearBtn = card.querySelector("#linkedin-notes-clear");
 
-    // --- LOGIQUE D'AFFICHAGE (VIEW vs EDIT) ---
+    // --- LOGIQUE D'AFFICHAGE ---
     
     function showEditMode() {
       viewDiv.classList.add("hidden");
@@ -85,23 +80,14 @@
 
     function showViewMode(text) {
       if (!text || text.trim() === "") {
-        // Si vide, on reste en mode édition pour inciter à écrire
+        // Si c'est vide, on reste en mode édition pour voir le placeholder
         showEditMode();
       } else {
-        // Sinon on affiche le mode lecture avec les liens
         textarea.classList.add("hidden");
-        viewDiv.innerHTML = linkify(text); // C'est ici que la magie opère
+        viewDiv.innerHTML = linkify(text);
         viewDiv.classList.remove("hidden");
       }
     }
-
-    // Basculer en mode édition quand on clique sur le texte
-    viewDiv.addEventListener("click", () => {
-      textarea.value = viewDiv.innerText; // On s'assure que le texte est synchro
-      showEditMode();
-    });
-
-    // --- ACTIONS BOUTONS ---
 
     function setSaveSuccess() {
       saveBtn.textContent = "Saved";
@@ -112,16 +98,33 @@
       }, 2000);
     }
 
+    // --- EVENTS LISTENERS ---
+
+    // 1. Clic sur le texte (Lecture -> Édition)
+    viewDiv.addEventListener("click", () => {
+      // On remet le texte brut dans le textarea avant d'afficher
+      textarea.value = viewDiv.innerText;
+      showEditMode();
+    });
+
+    // 2. Perte de Focus (Blur) -> PAS DE SAVE, JUSTE AFFICHAGE
+    textarea.addEventListener("blur", () => {
+       // On passe simplement en mode lecture visuelle
+       showViewMode(textarea.value);
+    });
+
+    // 3. Bouton Save -> LA SAUVEGARDE RÉELLE
     saveBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       const text = textarea.value.trim();
       
       browser.storage.sync.set({ [key]: text }).then(() => {
         setSaveSuccess();
-        showViewMode(text); // On repasse en mode lecture après sauvegarde
+        showViewMode(text); // On s'assure que l'affichage est à jour
       });
     });
 
+    // 4. Bouton Clear
     clearBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       if (confirm("Clear all notes?")) {
@@ -129,7 +132,7 @@
           viewDiv.innerHTML = "";
           browser.storage.sync.set({ [key]: "" }).then(() => {
             setSaveSuccess();
-            showEditMode(); // On remet le textarea vide
+            showEditMode();
           });
       }
     });
@@ -145,11 +148,9 @@
     browser.storage.onChanged.addListener((changes, area) => {
       if (area === 'sync' && changes[key]) {
         const newText = changes[key].newValue || "";
-        // Si on n'est pas en train d'éditer, on met à jour la vue
         if (textarea.classList.contains("hidden")) {
             showViewMode(newText);
         } else {
-            // Si on édite, on met à jour le textarea (attention aux conflits)
             if (document.activeElement !== textarea) {
                 textarea.value = newText;
             }
@@ -160,7 +161,7 @@
     return card;
   }
 
-  // --- 3. INJECTION (Rien ne change ici) ---
+  // --- 3. INJECTION ---
   function getTargetElement() {
     const candidates = [".pv-top-card", ".profile-top-card", ".ph5.pb5", "main > section:first-child"];
     for (let sel of candidates) {
