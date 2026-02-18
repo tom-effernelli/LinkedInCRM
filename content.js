@@ -4,19 +4,18 @@
   const STORAGE_KEY_PREFIX = "linkedin_notes_";
   let lastProfileId = null;
 
-  // --- 1. PROFILE ID ---
+  // --- 1. PROFILE ID (STRICT) ---
   function getProfileId() {
-    // Not on a profile URL: return null immediately
-    if (!window.location.pathname.includes("/in/")) return null;
-    
-    const id = window.location.pathname
-      .split("/in/")[1]
-      ?.split("/")[0]
-      ?.split("?")[0]
-      ?.split("#")[0];
-      
-    if (!id || id.trim() === "") return null;
-    return id.trim().toLowerCase();
+    // On découpe l'URL par les slashs et on retire les segments vides
+    const parts = window.location.pathname.split('/').filter(p => p);
+
+    // Un profil valide = exactement 2 segments : ["in", "nom-utilisateur"]
+    // Si parts.length > 2, c'est une sous-page (ex: /in/user/details/...) -> on renvoie null.
+    if (parts.length === 2 && parts[0] === "in") {
+        // On nettoie d'éventuels paramètres URL (au cas où ils n'auraient pas été gérés par pathname)
+        return parts[1].split('?')[0].split('#')[0].toLowerCase();
+    }
+    return null;
   }
 
   function getStorageKey() {
@@ -76,8 +75,18 @@
       }
     });
 
+    // Chargement initial
     browser.storage.sync.get(key).then((obj) => {
       if (obj[key]) textarea.value = obj[key];
+    });
+
+    // Synchro temps réel (optionnel mais recommandé pour ton multi-écran)
+    browser.storage.onChanged.addListener((changes, area) => {
+      if (area === 'sync' && changes[key]) {
+        if (document.activeElement !== textarea) {
+            textarea.value = changes[key].newValue || "";
+        }
+      }
     });
 
     return card;
@@ -85,7 +94,6 @@
 
   // --- 3. INJECTION ---
   function getTargetElement() {
-    // Selectors used to find the profile header
     const candidates = [
       ".pv-top-card",
       ".profile-top-card",
@@ -102,21 +110,18 @@
 
   function injectCard() {
     const currentId = getProfileId();
-    
-    // Not on a profile page: do nothing (still watching)
     if (!currentId) return;
 
     const existing = document.getElementById("linkedin-notes-extension-card");
-    if (existing) {
-      if (existing.dataset.profileId === currentId) return;
-      existing.remove();
-    }
+    
+    // Si la carte est déjà là avec le bon ID, on ne fait rien
+    if (existing && existing.dataset.profileId === currentId) return;
+    
+    // Si l'ID a changé, on nettoie
+    if (existing) existing.remove();
 
     const targetElement = getTargetElement();
-    if (!targetElement) {
-      console.log("LinkedIn Notes: Waiting for profile section...");
-      return;
-    }
+    if (!targetElement) return;
 
     const card = createNotesCard();
     if (!card) return;
@@ -125,23 +130,34 @@
     console.log("LinkedIn Notes: Card injected for", currentId);
   }
 
-  // --- 4. WATCH LOOP ---
+  // --- 4. WATCH LOOP (NETTOYAGE & SURVEILLANCE) ---
   function runLoop() {
-    injectCard();
-
     const currentId = getProfileId();
-    if (lastProfileId !== currentId) {
-      if (currentId) console.log("LinkedIn Notes: Profile changed ->", currentId);
-      lastProfileId = currentId;
-      removeCard();
-      setTimeout(injectCard, 500);
-      setTimeout(injectCard, 1500);
-      setTimeout(injectCard, 3000);
+
+    // Cas 1 : On n'est plus sur un profil principal (Flux, Page Education, etc.)
+    if (!currentId) {
+        if (lastProfileId !== null) {
+            console.log("LinkedIn Notes: Leaving profile main page -> Removing card.");
+            removeCard();
+            lastProfileId = null;
+        }
+        return;
     }
+
+    // Cas 2 : Changement de profil détecté
+    if (lastProfileId !== currentId) {
+        console.log("LinkedIn Notes: Profile changed ->", currentId);
+        lastProfileId = currentId;
+        removeCard(); 
+        // L'injection se fera à la ligne suivante
+    }
+
+    // Cas 3 : On est sur un profil, on s'assure que la carte est là
+    injectCard();
   }
 
   // --- 5. INIT ---
-  console.log("LinkedIn Notes: Extension loaded.");
+  console.log("LinkedIn Notes: Extension loaded (Strict Mode).");
 
   const observer = new MutationObserver(() => runLoop());
   observer.observe(document.body, { childList: true, subtree: true });
